@@ -9,7 +9,7 @@
 //
 // Model version                  : 8.6
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Nov  1 22:52:27 2023
+// C/C++ source code generated on : Wed Nov  1 23:04:19 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM 10
@@ -20,6 +20,11 @@
 
 // Block parameters (default storage)
 P_CC_Example_T CC_Example_P{
+  // Mask Parameter: DiscreteDerivative_ICPrevScaled
+  //  Referenced by: '<S2>/UD'
+
+  0.0,
+
   // Computed Parameter: Constant_Value
   //  Referenced by: '<S1>/Constant'
 
@@ -28,14 +33,14 @@ P_CC_Example_T CC_Example_P{
   },
 
   // Computed Parameter: Out1_Y0
-  //  Referenced by: '<S4>/Out1'
+  //  Referenced by: '<S5>/Out1'
 
   {
     0.0                                // Data
   },
 
   // Computed Parameter: Constant_Value_g
-  //  Referenced by: '<S3>/Constant'
+  //  Referenced by: '<S4>/Constant'
 
   {
     0.0                                // Data
@@ -50,6 +55,11 @@ P_CC_Example_T CC_Example_P{
   //  Referenced by: '<Root>/Gain2'
 
   1.0,
+
+  // Computed Parameter: TSamp_WtEt
+  //  Referenced by: '<S2>/TSamp'
+
+  20.0,
 
   // Expression: 0
   //  Referenced by: '<Root>/Integrator'
@@ -71,10 +81,10 @@ P_CC_Example_T CC_Example_P{
 
   -3.0,
 
-  // Expression: 1
+  // Expression: 0
   //  Referenced by: '<Root>/Gain'
 
-  1.0
+  0.0
 };
 
 //

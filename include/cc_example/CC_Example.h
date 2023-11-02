@@ -9,7 +9,7 @@
 //
 // Model version                  : 8.6
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Nov  1 22:52:27 2023
+// C/C++ source code generated on : Wed Nov  1 23:04:19 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM 10
@@ -23,21 +23,6 @@
 #include "rtw_solver.h"
 #include "slros_initialize.h"
 #include "CC_Example_types.h"
-
-extern "C"
-{
-
-#include "rt_nonfinite.h"
-
-}
-
-extern "C"
-{
-
-#include "rtGetInf.h"
-
-}
-
 #include <cstring>
 
 // Macros for accessing real-time model data structure
@@ -163,20 +148,17 @@ extern "C"
 
 // Block signals (default storage)
 struct B_CC_Example_T {
-  real_T Gain2;                        // '<Root>/Gain2'
+  real_T Diff;                         // '<S2>/Diff'
   real_T Gain1;                        // '<Root>/Gain1'
   real_T Gain;                         // '<Root>/Gain'
-  SL_Bus_CC_Example_std_msgs_Float64 In1;// '<S4>/In1'
+  SL_Bus_CC_Example_std_msgs_Float64 In1;// '<S5>/In1'
 };
 
 // Block states (default storage) for system '<Root>'
 struct DW_CC_Example_T {
-  ros_slroscpp_internal_block_P_T obj; // '<S2>/SinkBlock'
-  ros_slroscpp_internal_block_S_T obj_g;// '<S3>/SourceBlock'
-  real_T TimeStampA;                   // '<Root>/Derivative'
-  real_T LastUAtTimeA;                 // '<Root>/Derivative'
-  real_T TimeStampB;                   // '<Root>/Derivative'
-  real_T LastUAtTimeB;                 // '<Root>/Derivative'
+  ros_slroscpp_internal_block_P_T obj; // '<S3>/SinkBlock'
+  ros_slroscpp_internal_block_S_T obj_g;// '<S4>/SourceBlock'
+  real_T UD_DSTATE;                    // '<S2>/UD'
 };
 
 // Continuous states (default storage)
@@ -207,20 +189,27 @@ struct ODE3_IntgData {
 
 // Parameters (default storage)
 struct P_CC_Example_T_ {
+  real_T DiscreteDerivative_ICPrevScaled;
+                              // Mask Parameter: DiscreteDerivative_ICPrevScaled
+                                 //  Referenced by: '<S2>/UD'
+
   SL_Bus_CC_Example_std_msgs_Float64 Constant_Value;// Computed Parameter: Constant_Value
                                                        //  Referenced by: '<S1>/Constant'
 
   SL_Bus_CC_Example_std_msgs_Float64 Out1_Y0;// Computed Parameter: Out1_Y0
-                                                //  Referenced by: '<S4>/Out1'
+                                                //  Referenced by: '<S5>/Out1'
 
   SL_Bus_CC_Example_std_msgs_Float64 Constant_Value_g;// Computed Parameter: Constant_Value_g
-                                                         //  Referenced by: '<S3>/Constant'
+                                                         //  Referenced by: '<S4>/Constant'
 
   real_T Constant_Value_b;             // Expression: 20
                                           //  Referenced by: '<Root>/Constant'
 
   real_T Gain2_Gain;                   // Expression: 1
                                           //  Referenced by: '<Root>/Gain2'
+
+  real_T TSamp_WtEt;                   // Computed Parameter: TSamp_WtEt
+                                          //  Referenced by: '<S2>/TSamp'
 
   real_T Integrator_IC;                // Expression: 0
                                           //  Referenced by: '<Root>/Integrator'
@@ -234,7 +223,7 @@ struct P_CC_Example_T_ {
   real_T Saturation_LowerSat;          // Expression: -3
                                           //  Referenced by: '<Root>/Saturation'
 
-  real_T Gain_Gain;                    // Expression: 1
+  real_T Gain_Gain;                    // Expression: 0
                                           //  Referenced by: '<Root>/Gain'
 
 };
@@ -363,6 +352,12 @@ extern volatile boolean_T stopRequested;
 extern volatile boolean_T runModel;
 
 //-
+//  These blocks were eliminated from the model due to optimizations:
+//
+//  Block '<S2>/Data Type Duplicate' : Unused code path elimination
+
+
+//-
 //  The generated code includes comments that allow you to trace directly
 //  back to the appropriate location in the model.  The basic format
 //  is <system>/block_name, where system is the system number (uniquely
@@ -378,9 +373,10 @@ extern volatile boolean_T runModel;
 //
 //  '<Root>' : 'CC_Example'
 //  '<S1>'   : 'CC_Example/Blank Message'
-//  '<S2>'   : 'CC_Example/Publish'
-//  '<S3>'   : 'CC_Example/Subscribe1'
-//  '<S4>'   : 'CC_Example/Subscribe1/Enabled Subsystem'
+//  '<S2>'   : 'CC_Example/Discrete Derivative'
+//  '<S3>'   : 'CC_Example/Publish'
+//  '<S4>'   : 'CC_Example/Subscribe1'
+//  '<S5>'   : 'CC_Example/Subscribe1/Enabled Subsystem'
 
 #endif                                 // RTW_HEADER_CC_Example_h_
 

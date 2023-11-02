@@ -61,9 +61,6 @@ add_executable(CC_Example
   src/CC_Example_data.cpp
   src/main.cpp
   src/rosnodeinterface.cpp
-  src/rtGetInf.cpp
-  src/rtGetNaN.cpp
-  src/rt_nonfinite.cpp
   src/slros_busmsg_conversion.cpp
   src/slros_initialize.cpp
 )
@@ -126,4 +123,4 @@ add_custom_command(
                    ARGS -E copy ${PROJECT_SOURCE_DIR}/src/${file_i} ${CATKIN_DEVEL_PREFIX}/CC_Example_ert_rtw/${file_i}
 				   )
 endforeach(file_i)
-# Generated on Wed Nov 01 22:52:32 2023
+# Generated on Wed Nov 01 23:04:23 2023
