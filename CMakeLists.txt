@@ -61,6 +61,9 @@ add_executable(CC_Example
   src/CC_Example_data.cpp
   src/main.cpp
   src/rosnodeinterface.cpp
+  src/rtGetInf.cpp
+  src/rtGetNaN.cpp
+  src/rt_nonfinite.cpp
   src/slros_busmsg_conversion.cpp
   src/slros_initialize.cpp
 )
@@ -71,7 +74,7 @@ target_compile_options(CC_Example PUBLIC
   $<$<OR:$<COMPILE_LANGUAGE:CXX>,$<COMPILE_LANGUAGE:C>>:
   -DMODEL=CC_Example
   -DNUMST=2
-  -DNCSTATES=2
+  -DNCSTATES=1
   -DHAVESTDIO
   -DMODEL_HAS_DYNAMICALLY_LOADED_SFCNS=0
   -DCLASSIC_INTERFACE=0
@@ -123,4 +126,4 @@ add_custom_command(
                    ARGS -E copy ${PROJECT_SOURCE_DIR}/src/${file_i} ${CATKIN_DEVEL_PREFIX}/CC_Example_ert_rtw/${file_i}
 				   )
 endforeach(file_i)
-# Generated on Wed Nov 01 14:56:34 2023
+# Generated on Wed Nov 01 22:52:32 2023

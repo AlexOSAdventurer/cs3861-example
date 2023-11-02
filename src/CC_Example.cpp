@@ -9,7 +9,7 @@
 //
 // Model version                  : 8.6
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Nov  1 14:54:48 2023
+// C/C++ source code generated on : Wed Nov  1 22:52:27 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM 10
@@ -20,6 +20,13 @@
 #include "rtwtypes.h"
 #include "CC_Example_types.h"
 #include "CC_Example_private.h"
+
+extern "C"
+{
+
+#include "rt_nonfinite.h"
+
+}
 
 // Block signals (default storage)
 B_CC_Example_T CC_Example_B;
@@ -77,7 +84,7 @@ static void rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
 
   real_T hB[3];
   int_T i;
-  int_T nXc { 2 };
+  int_T nXc { 1 };
 
   rtsiSetSimTimeStep(si,MINOR_TIME_STEP);
 
@@ -132,10 +139,6 @@ static void rt_ertODEUpdateContinuousStates(RTWSolverInfo *si )
 // Model step function
 void CC_Example_step(void)
 {
-  SL_Bus_CC_Example_std_msgs_Float64 rtb_BusAssignment;
-  SL_Bus_CC_Example_std_msgs_Float64 rtb_BusAssignment2;
-  real_T rtb_Sum;
-  boolean_T b_varargout_1;
   if (rtmIsMajorTimeStep(CC_Example_M)) {
     // set solver stop time
     rtsiSetSolverStopTime(&CC_Example_M->solverInfo,
@@ -148,73 +151,122 @@ void CC_Example_step(void)
     CC_Example_M->Timing.t[0] = rtsiGetT(&CC_Example_M->solverInfo);
   }
 
-  // TransferFcn: '<S8>/Transfer Fcn2'
-  rtb_Sum = CC_Example_P.TransferFcn2_C * CC_Example_X.TransferFcn2_CSTATE;
+  {
+    SL_Bus_CC_Example_std_msgs_Float64 b_varargout_2;
+    SL_Bus_CC_Example_std_msgs_Float64 rtb_BusAssignment;
+    real_T lastTime;
+    real_T rtb_Saturation;
+    real_T rtb_Sum;
+    real_T *lastU;
+    boolean_T b_varargout_1;
+    if (rtmIsMajorTimeStep(CC_Example_M)) {
+      // Outputs for Atomic SubSystem: '<Root>/Subscribe1'
+      // MATLABSystem: '<S3>/SourceBlock'
+      b_varargout_1 = Sub_CC_Example_36.getLatestMessage(&b_varargout_2);
 
-  // BusAssignment: '<Root>/Bus Assignment'
-  rtb_BusAssignment.Data = rtb_Sum;
+      // Outputs for Enabled SubSystem: '<S3>/Enabled Subsystem' incorporates:
+      //   EnablePort: '<S4>/Enable'
 
-  // Outputs for Atomic SubSystem: '<Root>/Publish'
-  // MATLABSystem: '<S3>/SinkBlock'
-  Pub_CC_Example_38.publish(&rtb_BusAssignment);
+      // Start for MATLABSystem: '<S3>/SourceBlock'
+      if (b_varargout_1) {
+        // SignalConversion generated from: '<S4>/In1'
+        CC_Example_B.In1 = b_varargout_2;
+      }
 
-  // End of Outputs for SubSystem: '<Root>/Publish'
-  if (rtmIsMajorTimeStep(CC_Example_M)) {
-    // Outputs for Atomic SubSystem: '<Root>/Subscribe1'
-    // MATLABSystem: '<S7>/SourceBlock'
-    b_varargout_1 = Sub_CC_Example_36.getLatestMessage(&rtb_BusAssignment);
+      // End of Start for MATLABSystem: '<S3>/SourceBlock'
+      // End of Outputs for SubSystem: '<S3>/Enabled Subsystem'
+      // End of Outputs for SubSystem: '<Root>/Subscribe1'
 
-    // Outputs for Enabled SubSystem: '<S7>/Enabled Subsystem' incorporates:
-    //   EnablePort: '<S10>/Enable'
+      // Sum: '<Root>/Sum' incorporates:
+      //   Constant: '<Root>/Constant'
 
-    // Start for MATLABSystem: '<S7>/SourceBlock'
-    if (b_varargout_1) {
-      // SignalConversion generated from: '<S10>/In1'
-      CC_Example_B.In1 = rtb_BusAssignment;
+      rtb_Sum = CC_Example_B.In1.Data - CC_Example_P.Constant_Value_b;
+
+      // Gain: '<Root>/Gain2'
+      CC_Example_B.Gain2 = CC_Example_P.Gain2_Gain * rtb_Sum;
     }
 
-    // End of Start for MATLABSystem: '<S7>/SourceBlock'
-    // End of Outputs for SubSystem: '<S7>/Enabled Subsystem'
-    // End of Outputs for SubSystem: '<Root>/Subscribe1'
+    // Derivative: '<Root>/Derivative'
+    rtb_Saturation = CC_Example_M->Timing.t[0];
+    if ((CC_Example_DW.TimeStampA >= rtb_Saturation) &&
+        (CC_Example_DW.TimeStampB >= rtb_Saturation)) {
+      rtb_Saturation = 0.0;
+    } else {
+      lastTime = CC_Example_DW.TimeStampA;
+      lastU = &CC_Example_DW.LastUAtTimeA;
+      if (CC_Example_DW.TimeStampA < CC_Example_DW.TimeStampB) {
+        if (CC_Example_DW.TimeStampB < rtb_Saturation) {
+          lastTime = CC_Example_DW.TimeStampB;
+          lastU = &CC_Example_DW.LastUAtTimeB;
+        }
+      } else if (CC_Example_DW.TimeStampA >= rtb_Saturation) {
+        lastTime = CC_Example_DW.TimeStampB;
+        lastU = &CC_Example_DW.LastUAtTimeB;
+      }
 
-    // SignalConversion generated from: '<Root>/Bus Selector'
-    CC_Example_B.Data = CC_Example_B.In1.Data;
+      rtb_Saturation = (CC_Example_B.Gain2 - *lastU) / (rtb_Saturation -
+        lastTime);
+    }
+
+    // End of Derivative: '<Root>/Derivative'
+    if (rtmIsMajorTimeStep(CC_Example_M)) {
+      // Gain: '<Root>/Gain1'
+      CC_Example_B.Gain1 = CC_Example_P.Gain1_Gain * rtb_Sum;
+    }
+
+    // Sum: '<Root>/Sum1' incorporates:
+    //   Integrator: '<Root>/Integrator'
+
+    rtb_Saturation = (rtb_Saturation + CC_Example_X.Integrator_CSTATE) +
+      CC_Example_B.Gain1;
+
+    // Saturate: '<Root>/Saturation'
+    if (rtb_Saturation > CC_Example_P.Saturation_UpperSat) {
+      // BusAssignment: '<Root>/Bus Assignment'
+      rtb_BusAssignment.Data = CC_Example_P.Saturation_UpperSat;
+    } else if (rtb_Saturation < CC_Example_P.Saturation_LowerSat) {
+      // BusAssignment: '<Root>/Bus Assignment'
+      rtb_BusAssignment.Data = CC_Example_P.Saturation_LowerSat;
+    } else {
+      // BusAssignment: '<Root>/Bus Assignment'
+      rtb_BusAssignment.Data = rtb_Saturation;
+    }
+
+    // End of Saturate: '<Root>/Saturation'
+
+    // Outputs for Atomic SubSystem: '<Root>/Publish'
+    // MATLABSystem: '<S2>/SinkBlock'
+    Pub_CC_Example_38.publish(&rtb_BusAssignment);
+
+    // End of Outputs for SubSystem: '<Root>/Publish'
+    if (rtmIsMajorTimeStep(CC_Example_M)) {
+      // Gain: '<Root>/Gain'
+      CC_Example_B.Gain = CC_Example_P.Gain_Gain * rtb_Sum;
+    }
   }
 
-  // Sum: '<Root>/Sum'
-  rtb_Sum = CC_Example_B.Data - rtb_Sum;
-
-  // Sum: '<Root>/Sum1' incorporates:
-  //   Gain: '<Root>/Gain1'
-  //   Integrator: '<Root>/Integrator'
-
-  CC_Example_B.Sum1 = CC_Example_P.Gain1_Gain * rtb_Sum +
-    CC_Example_X.Integrator_CSTATE;
-
-  // BusAssignment: '<Root>/Bus Assignment2'
-  rtb_BusAssignment2.Data = CC_Example_B.Sum1;
-
-  // Outputs for Atomic SubSystem: '<Root>/Publish2'
-  // MATLABSystem: '<S5>/SinkBlock'
-  Pub_CC_Example_40.publish(&rtb_BusAssignment2);
-
-  // End of Outputs for SubSystem: '<Root>/Publish2'
-
-  // Gain: '<Root>/Gain'
-  CC_Example_B.Gain = CC_Example_P.Gain_Gain * rtb_Sum;
   if (rtmIsMajorTimeStep(CC_Example_M)) {
-    // Outputs for Atomic SubSystem: '<Root>/Publish1'
-    // MATLABSystem: '<S4>/SinkBlock'
-    Pub_CC_Example_39.publish(&CC_Example_B.In1);
+    real_T *lastU;
 
-    // End of Outputs for SubSystem: '<Root>/Publish1'
+    // Update for Derivative: '<Root>/Derivative'
+    if (CC_Example_DW.TimeStampA == (rtInf)) {
+      CC_Example_DW.TimeStampA = CC_Example_M->Timing.t[0];
+      lastU = &CC_Example_DW.LastUAtTimeA;
+    } else if (CC_Example_DW.TimeStampB == (rtInf)) {
+      CC_Example_DW.TimeStampB = CC_Example_M->Timing.t[0];
+      lastU = &CC_Example_DW.LastUAtTimeB;
+    } else if (CC_Example_DW.TimeStampA < CC_Example_DW.TimeStampB) {
+      CC_Example_DW.TimeStampA = CC_Example_M->Timing.t[0];
+      lastU = &CC_Example_DW.LastUAtTimeA;
+    } else {
+      CC_Example_DW.TimeStampB = CC_Example_M->Timing.t[0];
+      lastU = &CC_Example_DW.LastUAtTimeB;
+    }
 
-    // Outputs for Atomic SubSystem: '<Root>/Subscribe'
-    // MATLABSystem: '<S6>/SourceBlock'
-    Sub_CC_Example_37.getLatestMessage(&rtb_BusAssignment);
+    *lastU = CC_Example_B.Gain2;
 
-    // End of Outputs for SubSystem: '<Root>/Subscribe'
-  }
+    // End of Update for Derivative: '<Root>/Derivative'
+  }                                    // end MajorTimeStep
 
   if (rtmIsMajorTimeStep(CC_Example_M)) {
     rt_ertODEUpdateContinuousStates(&CC_Example_M->solverInfo);
@@ -246,11 +298,6 @@ void CC_Example_derivatives(void)
   XDot_CC_Example_T *_rtXdot;
   _rtXdot = ((XDot_CC_Example_T *) CC_Example_M->derivs);
 
-  // Derivatives for TransferFcn: '<S8>/Transfer Fcn2'
-  _rtXdot->TransferFcn2_CSTATE = CC_Example_P.TransferFcn2_A *
-    CC_Example_X.TransferFcn2_CSTATE;
-  _rtXdot->TransferFcn2_CSTATE += CC_Example_B.Sum1;
-
   // Derivatives for Integrator: '<Root>/Integrator'
   _rtXdot->Integrator_CSTATE = CC_Example_B.Gain;
 }
@@ -259,6 +306,10 @@ void CC_Example_derivatives(void)
 void CC_Example_initialize(void)
 {
   // Registration code
+
+  // initialize non-finites
+  rt_InitInfAndNaN(sizeof(real_T));
+
   {
     // Setup solver object
     rtsiSetSimTimeStepPtr(&CC_Example_M->solverInfo,
@@ -300,155 +351,79 @@ void CC_Example_initialize(void)
   CC_Example_M->Timing.stepSize0 = 0.05;
 
   {
-    static const char_T b_zeroDelimTopic_2[30]{ "/car/state/suggested_velocity"
-    };
+    static const char_T b_zeroDelimTopic_2[15]{ "/cmd_accel_sim" };
 
-    static const char_T b_zeroDelimTopic_5[24]{ "/car/state/vel_x_echoed" };
-
-    static const char_T b_zeroDelimTopic_3[17]{ "/car/state/vel_x" };
-
-    static const char_T b_zeroDelimTopic_4[16]{ "/car/state/step" };
-
-    static const char_T b_zeroDelimTopic_6[11]{ "/lead_dist" };
+    static const char_T b_zeroDelimTopic_1[11]{ "/lead_dist" };
 
     int32_T i;
-    char_T b_zeroDelimTopic[17];
-    char_T b_zeroDelimTopic_0[16];
-    char_T b_zeroDelimTopic_1[11];
+    char_T b_zeroDelimTopic_0[15];
+    char_T b_zeroDelimTopic[11];
 
-    // InitializeConditions for TransferFcn: '<S8>/Transfer Fcn2'
-    CC_Example_X.TransferFcn2_CSTATE = 0.0;
+    // InitializeConditions for Derivative: '<Root>/Derivative'
+    CC_Example_DW.TimeStampA = (rtInf);
+    CC_Example_DW.TimeStampB = (rtInf);
 
     // InitializeConditions for Integrator: '<Root>/Integrator'
     CC_Example_X.Integrator_CSTATE = CC_Example_P.Integrator_IC;
 
-    // SystemInitialize for Atomic SubSystem: '<Root>/Publish'
-    // Start for MATLABSystem: '<S3>/SinkBlock'
+    // SystemInitialize for Atomic SubSystem: '<Root>/Subscribe1'
+    // SystemInitialize for Enabled SubSystem: '<S3>/Enabled Subsystem'
+    // SystemInitialize for SignalConversion generated from: '<S4>/In1' incorporates:
+    //   Outport: '<S4>/Out1'
+
+    CC_Example_B.In1 = CC_Example_P.Out1_Y0;
+
+    // End of SystemInitialize for SubSystem: '<S3>/Enabled Subsystem'
+
+    // Start for MATLABSystem: '<S3>/SourceBlock'
     CC_Example_DW.obj_g.matlabCodegenIsDeleted = false;
     CC_Example_DW.obj_g.isInitialized = 1;
-    for (i = 0; i < 30; i++) {
-      CC_Example_B.b_zeroDelimTopic[i] = b_zeroDelimTopic_2[i];
-    }
-
-    Pub_CC_Example_38.createPublisher(&CC_Example_B.b_zeroDelimTopic[0], 1);
-    CC_Example_DW.obj_g.isSetupComplete = true;
-
-    // End of Start for MATLABSystem: '<S3>/SinkBlock'
-    // End of SystemInitialize for SubSystem: '<Root>/Publish'
-
-    // SystemInitialize for Atomic SubSystem: '<Root>/Subscribe1'
-    // SystemInitialize for Enabled SubSystem: '<S7>/Enabled Subsystem'
-    // SystemInitialize for SignalConversion generated from: '<S10>/In1' incorporates:
-    //   Outport: '<S10>/Out1'
-
-    CC_Example_B.In1 = CC_Example_P.Out1_Y0_i;
-
-    // End of SystemInitialize for SubSystem: '<S7>/Enabled Subsystem'
-
-    // Start for MATLABSystem: '<S7>/SourceBlock'
-    CC_Example_DW.obj_gf.matlabCodegenIsDeleted = false;
-    CC_Example_DW.obj_gf.isInitialized = 1;
-    for (i = 0; i < 17; i++) {
-      b_zeroDelimTopic[i] = b_zeroDelimTopic_3[i];
+    for (i = 0; i < 11; i++) {
+      b_zeroDelimTopic[i] = b_zeroDelimTopic_1[i];
     }
 
     Sub_CC_Example_36.createSubscriber(&b_zeroDelimTopic[0], 1);
-    CC_Example_DW.obj_gf.isSetupComplete = true;
+    CC_Example_DW.obj_g.isSetupComplete = true;
 
-    // End of Start for MATLABSystem: '<S7>/SourceBlock'
+    // End of Start for MATLABSystem: '<S3>/SourceBlock'
     // End of SystemInitialize for SubSystem: '<Root>/Subscribe1'
 
-    // SystemInitialize for Atomic SubSystem: '<Root>/Publish2'
-    // Start for MATLABSystem: '<S5>/SinkBlock'
+    // SystemInitialize for Atomic SubSystem: '<Root>/Publish'
+    // Start for MATLABSystem: '<S2>/SinkBlock'
     CC_Example_DW.obj.matlabCodegenIsDeleted = false;
     CC_Example_DW.obj.isInitialized = 1;
-    for (i = 0; i < 16; i++) {
-      b_zeroDelimTopic_0[i] = b_zeroDelimTopic_4[i];
+    for (i = 0; i < 15; i++) {
+      b_zeroDelimTopic_0[i] = b_zeroDelimTopic_2[i];
     }
 
-    Pub_CC_Example_40.createPublisher(&b_zeroDelimTopic_0[0], 1);
+    Pub_CC_Example_38.createPublisher(&b_zeroDelimTopic_0[0], 1);
     CC_Example_DW.obj.isSetupComplete = true;
 
-    // End of Start for MATLABSystem: '<S5>/SinkBlock'
-    // End of SystemInitialize for SubSystem: '<Root>/Publish2'
-
-    // SystemInitialize for Atomic SubSystem: '<Root>/Publish1'
-    // Start for MATLABSystem: '<S4>/SinkBlock'
-    CC_Example_DW.obj_p.matlabCodegenIsDeleted = false;
-    CC_Example_DW.obj_p.isInitialized = 1;
-    for (i = 0; i < 24; i++) {
-      CC_Example_B.b_zeroDelimTopic_m[i] = b_zeroDelimTopic_5[i];
-    }
-
-    Pub_CC_Example_39.createPublisher(&CC_Example_B.b_zeroDelimTopic_m[0], 1);
-    CC_Example_DW.obj_p.isSetupComplete = true;
-
-    // End of Start for MATLABSystem: '<S4>/SinkBlock'
-    // End of SystemInitialize for SubSystem: '<Root>/Publish1'
-
-    // SystemInitialize for Atomic SubSystem: '<Root>/Subscribe'
-    // Start for MATLABSystem: '<S6>/SourceBlock'
-    CC_Example_DW.obj_e.matlabCodegenIsDeleted = false;
-    CC_Example_DW.obj_e.isInitialized = 1;
-    for (i = 0; i < 11; i++) {
-      b_zeroDelimTopic_1[i] = b_zeroDelimTopic_6[i];
-    }
-
-    Sub_CC_Example_37.createSubscriber(&b_zeroDelimTopic_1[0], 1);
-    CC_Example_DW.obj_e.isSetupComplete = true;
-
-    // End of Start for MATLABSystem: '<S6>/SourceBlock'
-    // End of SystemInitialize for SubSystem: '<Root>/Subscribe'
+    // End of Start for MATLABSystem: '<S2>/SinkBlock'
+    // End of SystemInitialize for SubSystem: '<Root>/Publish'
   }
 }
 
 // Model terminate function
 void CC_Example_terminate(void)
 {
-  // Terminate for Atomic SubSystem: '<Root>/Publish'
-  // Terminate for MATLABSystem: '<S3>/SinkBlock'
+  // Terminate for Atomic SubSystem: '<Root>/Subscribe1'
+  // Terminate for MATLABSystem: '<S3>/SourceBlock'
   if (!CC_Example_DW.obj_g.matlabCodegenIsDeleted) {
     CC_Example_DW.obj_g.matlabCodegenIsDeleted = true;
   }
 
-  // End of Terminate for MATLABSystem: '<S3>/SinkBlock'
-  // End of Terminate for SubSystem: '<Root>/Publish'
-
-  // Terminate for Atomic SubSystem: '<Root>/Subscribe1'
-  // Terminate for MATLABSystem: '<S7>/SourceBlock'
-  if (!CC_Example_DW.obj_gf.matlabCodegenIsDeleted) {
-    CC_Example_DW.obj_gf.matlabCodegenIsDeleted = true;
-  }
-
-  // End of Terminate for MATLABSystem: '<S7>/SourceBlock'
+  // End of Terminate for MATLABSystem: '<S3>/SourceBlock'
   // End of Terminate for SubSystem: '<Root>/Subscribe1'
 
-  // Terminate for Atomic SubSystem: '<Root>/Publish2'
-  // Terminate for MATLABSystem: '<S5>/SinkBlock'
+  // Terminate for Atomic SubSystem: '<Root>/Publish'
+  // Terminate for MATLABSystem: '<S2>/SinkBlock'
   if (!CC_Example_DW.obj.matlabCodegenIsDeleted) {
     CC_Example_DW.obj.matlabCodegenIsDeleted = true;
   }
 
-  // End of Terminate for MATLABSystem: '<S5>/SinkBlock'
-  // End of Terminate for SubSystem: '<Root>/Publish2'
-
-  // Terminate for Atomic SubSystem: '<Root>/Publish1'
-  // Terminate for MATLABSystem: '<S4>/SinkBlock'
-  if (!CC_Example_DW.obj_p.matlabCodegenIsDeleted) {
-    CC_Example_DW.obj_p.matlabCodegenIsDeleted = true;
-  }
-
-  // End of Terminate for MATLABSystem: '<S4>/SinkBlock'
-  // End of Terminate for SubSystem: '<Root>/Publish1'
-
-  // Terminate for Atomic SubSystem: '<Root>/Subscribe'
-  // Terminate for MATLABSystem: '<S6>/SourceBlock'
-  if (!CC_Example_DW.obj_e.matlabCodegenIsDeleted) {
-    CC_Example_DW.obj_e.matlabCodegenIsDeleted = true;
-  }
-
-  // End of Terminate for MATLABSystem: '<S6>/SourceBlock'
-  // End of Terminate for SubSystem: '<Root>/Subscribe'
+  // End of Terminate for MATLABSystem: '<S2>/SinkBlock'
+  // End of Terminate for SubSystem: '<Root>/Publish'
 }
 
 //

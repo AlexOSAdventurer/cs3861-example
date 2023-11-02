@@ -3,7 +3,7 @@
 // course requirements at degree granting institutions only.  Not for
 // government, commercial, or other organizational use.
 //
-// File: rtmodel.h
+// File: rtGetNaN.h
 //
 // Code generated for Simulink model 'CC_Example'.
 //
@@ -16,10 +16,33 @@
 // Code generation objectives: Unspecified
 // Validation result: Not run
 //
-#ifndef RTW_HEADER_rtmodel_h_
-#define RTW_HEADER_rtmodel_h_
-#include "CC_Example.h"
-#endif                                 // RTW_HEADER_rtmodel_h_
+#ifndef RTW_HEADER_rtGetNaN_h_
+#define RTW_HEADER_rtGetNaN_h_
+
+extern "C"
+{
+
+#include "rt_nonfinite.h"
+
+}
+
+#include "rtwtypes.h"
+#ifdef __cplusplus
+
+extern "C"
+{
+
+#endif
+
+  extern real_T rtGetNaN(void);
+  extern real32_T rtGetNaNF(void);
+
+#ifdef __cplusplus
+
+}                                      // extern "C"
+
+#endif
+#endif                                 // RTW_HEADER_rtGetNaN_h_
 
 //
 // File trailer for generated code.
