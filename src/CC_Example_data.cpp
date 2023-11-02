@@ -9,7 +9,7 @@
 //
 // Model version                  : 8.6
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Nov  1 23:04:19 2023
+// C/C++ source code generated on : Thu Nov  2 10:25:33 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM 10
@@ -46,15 +46,15 @@ P_CC_Example_T CC_Example_P{
     0.0                                // Data
   },
 
-  // Expression: 20
+  // Expression: 100
   //  Referenced by: '<Root>/Constant'
 
-  20.0,
+  100.0,
 
-  // Expression: 1
+  // Expression: 0
   //  Referenced by: '<Root>/Gain2'
 
-  1.0,
+  0.0,
 
   // Computed Parameter: TSamp_WtEt
   //  Referenced by: '<S2>/TSamp'
@@ -66,10 +66,10 @@ P_CC_Example_T CC_Example_P{
 
   0.0,
 
-  // Expression: 1
+  // Expression: 0.01
   //  Referenced by: '<Root>/Gain1'
 
-  1.0,
+  0.01,
 
   // Expression: 1.5
   //  Referenced by: '<Root>/Saturation'

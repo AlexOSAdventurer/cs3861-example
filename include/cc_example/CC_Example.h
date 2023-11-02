@@ -9,7 +9,7 @@
 //
 // Model version                  : 8.6
 // Simulink Coder version         : 23.2 (R2023b) 01-Aug-2023
-// C/C++ source code generated on : Wed Nov  1 23:04:19 2023
+// C/C++ source code generated on : Thu Nov  2 10:25:33 2023
 //
 // Target selection: ert.tlc
 // Embedded hardware selection: ARM Compatible->ARM 10
@@ -202,10 +202,10 @@ struct P_CC_Example_T_ {
   SL_Bus_CC_Example_std_msgs_Float64 Constant_Value_g;// Computed Parameter: Constant_Value_g
                                                          //  Referenced by: '<S4>/Constant'
 
-  real_T Constant_Value_b;             // Expression: 20
+  real_T Constant_Value_b;             // Expression: 100
                                           //  Referenced by: '<Root>/Constant'
 
-  real_T Gain2_Gain;                   // Expression: 1
+  real_T Gain2_Gain;                   // Expression: 0
                                           //  Referenced by: '<Root>/Gain2'
 
   real_T TSamp_WtEt;                   // Computed Parameter: TSamp_WtEt
@@ -214,7 +214,7 @@ struct P_CC_Example_T_ {
   real_T Integrator_IC;                // Expression: 0
                                           //  Referenced by: '<Root>/Integrator'
 
-  real_T Gain1_Gain;                   // Expression: 1
+  real_T Gain1_Gain;                   // Expression: 0.01
                                           //  Referenced by: '<Root>/Gain1'
 
   real_T Saturation_UpperSat;          // Expression: 1.5

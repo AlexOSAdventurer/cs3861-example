@@ -28,5 +28,5 @@
   #define CC_EXAMPLE_PUBLIC_TYPE
 #endif
 #endif  // CC_EXAMPLE__VISIBILITY_CONTROL_H_
-// Generated 01-Nov-2023 23:04:23
+// Generated 02-Nov-2023 10:25:37
 // Copyright 2019-2020 The MathWorks, Inc.
